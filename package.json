@@ -10,7 +10,8 @@
     "ansi-escapes": "^1.4.0",
     "chalk": "^1.1.3",
     "elegant-spinner": "^1.0.1",
-    "figures": "^1.7.0"
+    "figures": "^1.7.0",
+    "remove-from-array": "^0.1.0"
   },
   "devDependencies": {
     "standard": "^7.1.0"

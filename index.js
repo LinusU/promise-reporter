@@ -5,12 +5,7 @@ const figures = require('figures')
 const Readable = require('stream').Readable
 const ansiEscapes = require('ansi-escapes')
 const elegantSpinner = require('elegant-spinner')
-
-function removeFromArray (array, item) {
-  const idx = array.indexOf(item)
-  if (idx === -1) throw new Error('Unable to find item in array')
-  array.splice(idx, 1)
-}
+const removeFromArray = require('remove-from-array')
 
 class PromiseReporter extends Readable {
   constructor () {
