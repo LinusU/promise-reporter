@@ -14,9 +14,11 @@ npm install --save promise-reporter
 const Reporter = require('promise-reporter')
 const reporter = new Reporter()
 
+reporter.pipe(process.stderr)
+
 reporter.add('Query database', new Promise(/* ... */))
 reporter.add('Download S3 file', new Promise(/* ... */))
 reporter.add('Start EC2 instance', new Promise(/* ... */))
 
-reporter.pipe(process.stderr)
+reporter.end()
 ```

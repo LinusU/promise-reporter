@@ -20,9 +20,14 @@ class PromiseReporter extends Readable {
     this._running = false
     this._prevLineCount = 0
     this._frame = elegantSpinner()
+    this._allQueued = false
   }
 
   add (name, promise) {
+    if (this._allQueued) {
+      throw new Error('Cannot add another promise after .end() has been called')
+    }
+
     let item = { name, promise, status: 'pending' }
 
     this._pending.push(item)
@@ -56,7 +61,9 @@ class PromiseReporter extends Readable {
       return chalk.cyan(` ${frame} ${item.name}`)
     })
 
-    const text = settled.join('\n') + '\n\n' + pending.join('\n') + '\n'
+    const separator = (settled.length > 0 && pending.length > 0) ? '\n\n' : ''
+
+    const text = settled.join('\n') + separator + pending.join('\n') + '\n'
     const prevLineCount = this._prevLineCount
 
     this._prevLineCount = text.split('\n').length
@@ -70,7 +77,11 @@ class PromiseReporter extends Readable {
     this._running = true
 
     const pushFrame = () => {
-      if (this.push(this._renderFrame())) {
+      const wantMore = this.push(this._renderFrame())
+
+      if (this._pending.length === 0 && this._allQueued) {
+        this.push(null)
+      } else if (wantMore) {
         setTimeout(pushFrame, 50)
       } else {
         this._running = false
@@ -78,6 +89,14 @@ class PromiseReporter extends Readable {
     }
 
     pushFrame()
+  }
+
+  end () {
+    this._allQueued = true
+
+    if (this._pending.length === 0) {
+      this.push(null)
+    }
   }
 }
 
