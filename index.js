@@ -90,10 +90,6 @@ class PromiseReporter extends Readable {
 
   end () {
     this._allQueued = true
-
-    if (this._pending.length === 0) {
-      this.push(null)
-    }
   }
 }
 
