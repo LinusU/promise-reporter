@@ -39,6 +39,8 @@ class PromiseReporter extends Readable {
     ).catch(err => {
       this.emit('error', err)
     })
+
+    return promise
   }
 
   _renderFrame () {
