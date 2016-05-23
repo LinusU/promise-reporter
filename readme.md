@@ -22,3 +22,5 @@ reporter.add('Start EC2 instance', new Promise(/* ... */))
 
 reporter.end()
 ```
+
+![Example GIF](/example.gif?raw=true)
