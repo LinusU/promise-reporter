@@ -4,17 +4,30 @@ const chalk = require('chalk')
 const figures = require('figures')
 const Readable = require('stream').Readable
 const ansiEscapes = require('ansi-escapes')
-const elegantSpinner = require('elegant-spinner')
+const cliSpinners = require('cli-spinners')
 const removeFromArray = require('remove-from-array')
 
 class PromiseReporter extends Readable {
-  constructor () {
+  constructor (options) {
     super()
+
+    const sp = options && options.spinner
+    const defaultSpinner = process.platform === 'win32' ? cliSpinners.line : cliSpinners.dots
+    const spinner = (typeof sp === 'object' ? sp : cliSpinners[sp]) || defaultSpinner
+
+    if (!spinner.frames) throw new Error("spinner must define 'frames'")
+
     this._settled = []
     this._pending = []
     this._running = false
     this._prevLineCount = 0
-    this._frame = elegantSpinner()
+    this._spinner = (function () {
+      let i = 0
+      return {
+        frame: () => spinner.frames[++i % spinner.frames.length],
+        interval: spinner.interval || 50
+      }
+    }())
     this._allQueued = false
   }
 
@@ -44,7 +57,7 @@ class PromiseReporter extends Readable {
   }
 
   _renderFrame () {
-    const frame = this._frame()
+    const frame = this._spinner.frame()
 
     const settled = this._settled.map(item => {
       if (item.status === 'resolved') {
@@ -79,7 +92,7 @@ class PromiseReporter extends Readable {
       if (this._pending.length === 0 && this._allQueued) {
         this.push(null)
       } else if (wantMore) {
-        setTimeout(pushFrame, 50)
+        setTimeout(pushFrame, this._spinner.interval)
       } else {
         this._running = false
       }
