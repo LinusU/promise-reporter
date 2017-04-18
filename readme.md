@@ -40,3 +40,5 @@ Adds a promise to the reporter.
 
 Signal that no more promises will be added. When all the current promises have
 settled, the stream will end.
+
+Returns a `Promise` that will settle when the stream has ended.

@@ -29,6 +29,11 @@ class PromiseReporter extends Readable {
       }
     }())
     this._allQueued = false
+    this._hasEnded = false
+
+    this.on('end', () => {
+      this._hasEnded = true
+    })
   }
 
   add (name, promise) {
@@ -103,6 +108,15 @@ class PromiseReporter extends Readable {
 
   end () {
     this._allQueued = true
+
+    if (this._hasEnded) {
+      return Promise.resolve()
+    }
+
+    return new Promise((resolve, reject) => {
+      this.on('error', reject)
+      this.on('end', resolve)
+    })
   }
 }
 
